@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="studio_void">#0B0D11</color>
+    <color name="studio_surface">#131720</color>
+    <color name="studio_accent">#5B8CFF</color>
+</resources>

@@ -1,0 +1,111 @@
+<resources>
+    <string name="app_name">AI Voice Studio</string>
+    <string name="studio_brand_title">AI VOICE STUDIO</string>
+    <string name="studio_subtitle">Turn your recordings into clear, professional voice audio.</string>
+
+    <!-- Primary Actions -->
+    <string name="action_upload_audio">Import Audio</string>
+    <string name="action_record_voice">Record Audio</string>
+    <string name="action_replace_file">Replace</string>
+    <string name="action_remove_file">Remove</string>
+    <string name="action_stop_recording">Stop</string>
+    <string name="action_pause_recording">Pause</string>
+    <string name="action_resume_recording">Resume</string>
+    <string name="action_ai_enhance">AI Enhance</string>
+    <string name="action_re_enhance">Re-Enhance</string>
+    <string name="action_undo_enhance">Undo</string>
+    <string name="action_reset_ai">Reset to AI</string>
+    <string name="action_cancel_processing">Cancel Processing</string>
+    <string name="action_download_enhanced">Export Audio</string>
+    <string name="action_share_audio">Share Audio</string>
+    <string name="action_new_recording">New File</string>
+
+    <!-- Home Stage -->
+    <string name="home_drop_title">Drop or import your voice recording</string>
+    <string name="home_drop_subtitle">Clean noise, reduce echo, and balance speech automatically with one tap.</string>
+    <string name="home_supported_formats">Supports WAV, MP3, M4A, and AAC</string>
+    <string name="home_recent_title">Recent Sessions</string>
+
+    <!-- Pre-Enhance Stage -->
+    <string name="pre_enhance_ready_badge">Ready for AI Enhancement</string>
+    <string name="pre_enhance_mode_label">Enhancement Mode (Optional)</string>
+    <string name="pre_enhance_hint">AI automatically analyzes noise floor, speech loudness, and room acoustics.</string>
+
+    <!-- Processing Stage -->
+    <string name="processing_title">Enhancing Your Voice</string>
+    <string name="processing_subtitle">Running adaptive on-device studio pipeline</string>
+
+    <!-- Studio Stage (Post-Enhancement) -->
+    <string name="studio_stage_title">Voice Studio</string>
+    <string name="studio_stage_subtitle">AI-enhanced master • Fine-tune or export</string>
+    <string name="ab_original">Original</string>
+    <string name="ab_enhanced">AI Enhanced</string>
+    <string name="studio_presets_title">Studio Presets</string>
+    <string name="studio_adjustments_title">Advanced Voice Adjustments</string>
+    <string name="studio_adjustments_subtitle">Fine-tune safely on top of your AI result</string>
+    <string name="studio_updating_preview">Updating preview…</string>
+
+    <!-- 11 Advanced Adjustment Controls -->
+    <string name="adj_voice_clarity">Voice Clarity</string>
+    <string name="adj_voice_clarity_desc">Improve speech articulation and cut low-mid mud</string>
+    <string name="adj_voice_balance">Voice Balance</string>
+    <string name="adj_voice_balance_desc">Balance quiet and loud sentences smoothly</string>
+    <string name="adj_warmth">Warmth</string>
+    <string name="adj_warmth_desc">Add subtle low-mid fullness without muddiness</string>
+    <string name="adj_presence">Presence</string>
+    <string name="adj_presence_desc">Bring the vocal forward with focused midrange</string>
+    <string name="adj_noise_reduction">Noise Reduction</string>
+    <string name="adj_noise_reduction_desc">Suppress remaining fan, hiss, and room noise</string>
+    <string name="adj_voice_volume">Voice Volume</string>
+    <string name="adj_voice_volume_desc">Adjust output loudness safely under -1 dBTP</string>
+    <string name="adj_bass">Bass</string>
+    <string name="adj_bass_desc">Fine-tune deep low-end body</string>
+    <string name="adj_treble">Treble</string>
+    <string name="adj_treble_desc">Fine-tune upper crispness and air</string>
+    <string name="adj_compression">Compression</string>
+    <string name="adj_compression_desc">Smooth vocal dynamics for consistent energy</string>
+    <string name="adj_de_esser">De-Esser</string>
+    <string name="adj_de_esser_desc">Tame harsh S and SH sibilance</string>
+    <string name="adj_reverb_reduction">Reverb Reduction</string>
+    <string name="adj_reverb_reduction_desc">Reduce lingering room echo and reflections</string>
+
+    <!-- Ultra Clean Warning -->
+    <string name="ultra_clean_warning_title">Ultra Clean may be aggressive for this clip</string>
+    <string name="ultra_clean_warning_body">This recording is already fairly quiet or delicate. Auto or Light mode preserves more natural vocal detail.</string>
+
+    <!-- AI Notice (Firebase Declined) -->
+    <string name="ai_firebase_notice_title">On-Device Adaptive Engine</string>
+    <string name="ai_firebase_notice_body">All noise removal, speech leveling, EQ, de-essing, and quality validation run genuinely on-device with zero API cost. Optional cloud Gemini coaching requires Firebase AI Logic.</string>
+
+    <!-- Final Export Screen -->
+    <string name="export_title">Final Export</string>
+    <string name="export_subtitle">Saved directly to Downloads/AI Voice Studio</string>
+    <string name="export_filename_label">File Name</string>
+    <string name="export_format_label">Format &amp; Quality</string>
+    <string name="export_bitrate_label">Bitrate</string>
+    <string name="export_lossless_badge">Uncompressed lossless PCM — genuine processed master</string>
+    <string name="export_sample_rate_label">Sample Rate</string>
+    <string name="export_channels_label">Channels</string>
+    <string name="export_estimated_size">Estimated File Size</string>
+    <string name="export_button_save">Save to Downloads</string>
+    <string name="export_in_progress">Rendering &amp; saving audio…</string>
+    <string name="export_complete_title">Audio Saved to Downloads</string>
+
+    <!-- Privacy Sheet -->
+    <string name="privacy_title">Workspace &amp; Privacy</string>
+    <string name="privacy_guarantee">All audio stays private on your device. No login, no cloud upload, and temporary processing files are cleaned automatically.</string>
+    <string name="privacy_delete_current">Remove Loaded Audio</string>
+    <string name="privacy_wipe_temp">Clear Temporary Files</string>
+
+    <!-- Permissions -->
+    <string name="mic_permission_denied">Microphone permission is required to record audio.</string>
+
+    <!-- Accessibility Content Descriptions -->
+    <string name="cd_privacy_shield">Open workspace storage and privacy controls</string>
+    <string name="cd_play_pause">Play or pause audio</string>
+    <string name="cd_rewind_5s">Rewind 5 seconds</string>
+    <string name="cd_forward_5s">Forward 5 seconds</string>
+    <string name="cd_remove_audio">Remove loaded audio track</string>
+    <string name="cd_reset_control">Reset adjustment to AI baseline</string>
+    <string name="cd_navigate_back">Navigate back</string>
+</resources>
