@@ -1,0 +1,155 @@
+name: Build Android APK & Publish Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Optional release tag (e.g. v1.0.0). Leave empty for automatic tag."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    name: Build APK & Publish to Releases
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.3.1"
+
+      - name: Accept Android SDK licenses
+        run: |
+          SDK_MANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          if [ -x "$SDK_MANAGER" ]; then
+            yes | "$SDK_MANAGER" --licenses > /dev/null 2>&1 || true
+          fi
+
+      - name: Configure signing keystore
+        id: signing
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$RELEASE_KEYSTORE_BASE64" ] && [ -n "$STORE_PASSWORD" ] && [ -n "$KEY_PASSWORD" ]; then
+            echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > my-upload-key.jks
+            echo "build_type=release" >> "$GITHUB_OUTPUT"
+            echo "Using release signing keystore from GitHub Secrets."
+          else
+            if [ ! -f debug.keystore ]; then
+              if [ -f debug.keystore.base64 ]; then
+                base64 --decode debug.keystore.base64 > debug.keystore
+              else
+                keytool -genkey -v \
+                  -keystore debug.keystore \
+                  -storepass android \
+                  -alias androiddebugkey \
+                  -keypass android \
+                  -keyalg RSA \
+                  -keysize 2048 \
+                  -validity 10000 \
+                  -dname "CN=Android Debug,O=Android,C=US"
+              fi
+            fi
+            echo "build_type=debug" >> "$GITHUB_OUTPUT"
+            echo "Using debug signing keystore for directly installable APK."
+          fi
+
+      - name: Run DSP & audio unit tests
+        run: gradle :app:testDebugUnitTest --tests "com.example.ExampleUnitTest"
+
+      - name: Build Android APK
+        id: build_apk
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/my-upload-key.jks
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ "${{ steps.signing.outputs.build_type }}" = "release" ]; then
+            gradle :app:assembleRelease
+            SRC_APK="app/build/outputs/apk/release/app-release.apk"
+          else
+            gradle :app:assembleDebug
+            SRC_APK="app/build/outputs/apk/debug/app-debug.apk"
+          fi
+
+          if [ ! -f "$SRC_APK" ]; then
+            echo "ERROR: Expected APK not found at $SRC_APK"
+            exit 1
+          fi
+
+          if [ -n "${{ github.event.inputs.release_tag }}" ]; then
+            TAG="${{ github.event.inputs.release_tag }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG="v1.0.${{ github.run_number }}"
+          fi
+
+          mkdir -p dist
+          APK_NAME="AI-Voice-Studio-${TAG}.apk"
+          cp "$SRC_APK" "dist/${APK_NAME}"
+
+          echo "release_tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "apk_path=dist/${APK_NAME}" >> "$GITHUB_OUTPUT"
+          echo "apk_name=${APK_NAME}" >> "$GITHUB_OUTPUT"
+          ls -lh "dist/${APK_NAME}"
+
+      - name: Upload APK build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.build_apk.outputs.apk_name }}
+          path: ${{ steps.build_apk.outputs.apk_path }}
+          retention-days: 30
+
+      - name: Publish APK to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.build_apk.outputs.release_tag }}
+          APK_PATH: ${{ steps.build_apk.outputs.apk_path }}
+          BUILD_TYPE: ${{ steps.signing.outputs.build_type }}
+        run: |
+          NOTES=$(cat <<EOF
+          ## AI Voice Studio (${TAG})
+
+          Automatically built and verified by GitHub Actions (\`${BUILD_TYPE}\` signed APK).
+
+          ### Highlights
+          - AI-First Workflow: Upload or Record -> One-Tap AI Enhance -> Post-Enhancement Studio -> Final Export
+          - Adaptive on-device DSP engine (noise removal, wind/hum cleanup, echo reduction, clarity EQ, de-esser, sentence leveling, -14 LUFS / -1.0 dBTP limiter)
+          - Synchronized Original vs AI Enhanced A/B player + 6 Studio Presets + 11 manual adjustment sliders
+          - High-fidelity export: WAV 16/24-bit Lossless, MP3 320 kbps, M4A High Quality (44.1 / 48 kHz, Mono / Stereo) + Share Audio
+          EOF
+          )
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK_PATH" --clobber
+          else
+            gh release create "$TAG" "$APK_PATH" \
+              --title "AI Voice Studio ${TAG}" \
+              --notes "$NOTES"
+          fi
